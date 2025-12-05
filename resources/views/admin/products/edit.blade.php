@@ -30,10 +30,13 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <input type="checkbox" name="is_active" value="1"
-                       {{ old('is_active', $product->is_active) ? 'checked' : '' }}
-                       class="h-4 w-4 text-blue-600 border-gray-300 rounded">
-                <span class="text-sm text-gray-700">Active</span>
+                <label class="block mt-3">
+                        <span class="text-gray-700 font-medium">Status</span>
+                        <select name="is_active" class="w-full px-3 py-2 border rounded">
+                            <option value="1" {{ $product->is_active ? 'selected' : '' }}>Active</option>
+                            <option value="0" {{ !$product->is_active ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                </label>
             </div>
         </div>
 

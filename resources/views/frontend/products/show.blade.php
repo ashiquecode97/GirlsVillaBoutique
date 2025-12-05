@@ -12,7 +12,7 @@
 
         <p class="text-gray-600 mb-4">{{ $product->description }}</p>
 
-        <p class="text-2xl font-semibold text-green-600 mb-6">₹{{ $product->price }}</p>
+        <p class="text-2xl font-semibold text-green-600 mb-6">Only ₹{{ $product->price }}/-</p>
 
         @auth
         <form action="{{ route('cart.add', $product) }}" method="POST">

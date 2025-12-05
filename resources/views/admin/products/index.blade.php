@@ -4,94 +4,103 @@
 
 @section('content')
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800">Products</h1>
-            <p class="text-sm text-gray-500">Manage all products in your catalog.</p>
+            <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight">Products</h1>
+            <p class="text-sm text-gray-500 mt-1">Manage and control your full product inventory.</p>
         </div>
 
         {{-- CREATE BUTTON --}}
         <a href="{{ route('admin.products.create') }}"
-           class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1">
+            class="inline-flex items-center px-5 py-2.5 
+                bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 
+                text-white rounded-lg text-sm font-semibold
+                shadow-md hover:shadow-xl transition-all duration-300 
+                hover:-translate-y-1 hover:scale-[1.04]">
             + Add New Product
         </a>
     </div>
 
     {{-- Flash message --}}
     @if(session('success'))
-        <div class="mb-4 px-4 py-2 bg-green-50 text-green-800 border border-green-200 rounded-md text-sm">
+        <div class="mb-5 px-4 py-3 bg-green-50 text-green-800 border border-green-200 rounded-md text-sm shadow-sm">
             {{ session('success') }}
         </div>
     @endif
 
-    {{-- Table wrapper --}}
-    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+    {{-- Card Wrapper --}}
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+
+        {{-- Table --}}
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm text-left">
-                <thead class="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-600 uppercase">
+                <thead class="bg-gray-50 border-b border-gray-200">
                     <tr>
-                        <th class="px-4 py-3 w-12">ID</th>
-                        <th class="px-4 py-3">Image</th>
-                        <th class="px-4 py-3">Name</th>
-                        <th class="px-4 py-3">Price</th>
-                        <th class="px-4 py-3">Stock</th>
-                        <th class="px-4 py-3">Status</th>
-                        <th class="px-4 py-3 text-right w-48">Actions</th>
+                        <th class="px-5 py-3 font-semibold text-gray-600">ID</th>
+                        <th class="px-5 py-3 font-semibold text-gray-600">Image</th>
+                        <th class="px-5 py-3 font-semibold text-gray-600">Name</th>
+                        <th class="px-5 py-3 font-semibold text-gray-600">Price</th>
+                        <th class="px-5 py-3 font-semibold text-gray-600">Stock</th>
+                        <th class="px-5 py-3 font-semibold text-gray-600">Status</th>
+                        <th class="px-5 py-3 font-semibold text-gray-600 text-right">Actions</th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y divide-gray-100">
                     @forelse($products as $product)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-gray-700">
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            
+                            <td class="px-5 py-3 text-gray-700 font-medium">
                                 {{ $product->id }}
                             </td>
 
-                            <td class="px-4 py-3">
+                            <td class="px-5 py-3">
                                 @if($product->image)
                                     <img src="{{ asset('storage/'.$product->image) }}"
-                                         class="w-10 h-10 object-cover rounded-md border border-gray-200">
+                                         class="w-12 h-12 object-cover rounded-md shadow-sm border border-gray-200">
                                 @else
                                     <span class="text-xs text-gray-400">No image</span>
                                 @endif
                             </td>
 
-                            <td class="px-4 py-3">
-                                <div class="font-medium text-gray-800">
+                            <td class="px-5 py-3">
+                                <div class="font-semibold text-gray-800">
                                     {{ $product->name }}
                                 </div>
-                                @if($product->description)
-                                    <div class="text-xs text-gray-500">
-                                        {{ Str::limit($product->description, 40) }}
-                                    </div>
-                                @endif
+                                <div class="text-xs text-gray-500">
+                                    {{ Str::limit($product->description, 40) }}
+                                </div>
                             </td>
 
-                            <td class="px-4 py-3 text-gray-800">
+                            <td class="px-5 py-3 text-gray-700 font-medium">
                                 ₹{{ $product->price }}
                             </td>
 
-                            <td class="px-4 py-3 text-gray-700">
+                            <td class="px-5 py-3 text-gray-700">
                                 {{ $product->stock }}
                             </td>
 
-                            <td class="px-4 py-3">
+                            <td class="px-5 py-3">
                                 @if($product->is_active)
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                                    <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-300">
                                         Active
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                                    <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-300">
                                         Inactive
                                     </span>
                                 @endif
                             </td>
 
-                            <td class="px-4 py-3 text-right">
-                                <div class="inline-flex items-center gap-2">
+                            <td class="px-5 py-3 text-right">
+                                <div class="inline-flex items-center gap-3">
+
                                     {{-- EDIT BUTTON --}}
                                     <a href="{{ route('admin.products.edit', $product) }}"
-                                       class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white rounded-md text-xs font-medium hover:bg-indigo-700">
+                                        class="px-4 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 
+                                            text-white rounded-md shadow hover:shadow-lg 
+                                            hover:-translate-y-0.5 hover:scale-105
+                                            transition-all duration-300 text-xs font-semibold">
                                         Edit
                                     </a>
 
@@ -102,18 +111,22 @@
                                         @csrf
                                         @method('DELETE')
 
-                                        <button type="submit"
-                                                class="inline-flex items-center px-3 py-1.5 bg-red-600 text-white rounded-md text-xs font-medium hover:bg-red-700">
+                                        <button class="px-4 py-1.5 bg-gradient-to-r from-red-500 to-red-700 
+                                            text-white rounded-md shadow hover:shadow-lg 
+                                            hover:-translate-y-0.5 hover:scale-105
+                                            transition-all duration-300 text-xs font-semibold">
                                             Delete
                                         </button>
                                     </form>
+
                                 </div>
                             </td>
+
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-4 py-6 text-center text-gray-500 text-sm">
-                                No products found. Click “Add New Product” to create one.
+                            <td colspan="7" class="px-5 py-6 text-center text-gray-500 italic">
+                                No products found.
                             </td>
                         </tr>
                     @endforelse
@@ -122,8 +135,9 @@
         </div>
 
         {{-- Pagination --}}
-        <div class="px-4 py-3 border-t border-gray-100 bg-gray-50">
+        <div class="px-5 py-4 border-t border-gray-100 bg-gray-50">
             {{ $products->links() }}
         </div>
+
     </div>
 @endsection

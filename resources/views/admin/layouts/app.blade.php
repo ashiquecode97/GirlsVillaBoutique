@@ -31,6 +31,11 @@
                       {{ request()->routeIs('admin.products.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
                 Products
             </a>
+            <a href="{{ route('admin.orders.index') }}"
+               class="block px-3 py-2 rounded-md text-sm
+                      {{ request()->routeIs('admin.orders.*') ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
+                Orders
+            </a>
         </nav>
 
         <div class="px-4 py-4 border-t border-gray-700">
