@@ -90,21 +90,41 @@
             <tr>
                 <th class="p-4 text-left">Product</th>
                 <th class="p-4 text-left">Quantity</th>
+                {{-- <th class="p-4 text-left">Size</th> --}}
                 <th class="p-4 text-left">Price</th>
                 <th class="p-4 text-left">Total</th>
             </tr>
         </thead>
 
-        <tbody class="text-gray-700 divide-y">
-            @foreach($order->items as $item)
-            <tr class="hover:bg-gray-50 transition">
-                <td class="p-4 font-medium text-gray-800">{{ $item->product->name }}</td>
-                <td class="p-4">{{ $item->quantity }}</td>
-                <td class="p-4">₹{{ number_format($item->price) }}</td>
-                <td class="p-4 font-semibold">₹{{ number_format($item->price * $item->quantity) }}</td>
-            </tr>
-            @endforeach
-        </tbody>
+       <tbody class="text-gray-700 divide-y">
+    @foreach($order->items as $item)
+    <tr class="hover:bg-gray-50 transition">
+
+        <!-- PRODUCT NAME + SIZE -->
+        <td class="p-4 font-medium text-gray-800">
+            {{ $item->product->name }}
+
+            @if($item->size)
+                <span class="ml-2 px-2 py-1 bg-gray-100 rounded text-sm text-gray-600">
+                    Size: {{ $item->size }}
+                </span>
+            @endif
+        </td>
+
+        <td class="p-4">{{ $item->quantity }}</td>
+
+        <td class="p-4">₹{{ number_format($item->price) }}</td>
+
+        <td class="p-4 font-semibold">
+            ₹{{ number_format($item->price * $item->quantity) }}
+        </td>
+
+    </tr>
+    @endforeach
+</tbody>
+
+
+
     </table>
 
     <div class="mt-6 text-xl font-bold text-gray-900">

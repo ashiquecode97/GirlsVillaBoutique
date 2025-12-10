@@ -19,6 +19,11 @@ Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])-
 Route::get('/my-orders', [UserOrderController::class, 'index'])
     ->middleware('auth')
     ->name('user.orders');
+    Route::get('/my-orders/{order}', 
+    [UserOrderController::class, 'show'])
+    ->name('user.orders.show')
+    ->middleware('auth');
+
 
 
 // BREEZE AUTH ROUTES

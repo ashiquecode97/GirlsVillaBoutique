@@ -6,105 +6,221 @@
 
     <style>
         body {
-            font-family: DejaVu Sans, sans-serif;
+            font-family: 'DejaVu Sans', sans-serif;
+            margin: 0;
+            padding: 0;
             color: #333;
-            font-size: 14px;
         }
-        .invoice-box {
-            padding: 20px;
-            border: 1px solid #ddd;
+
+        .wrapper {
+            width: 100%;
+            padding: 25px 35px;
         }
-        .heading {
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .header img {
+            width: 110px;
+            margin-bottom: 8px;
+        }
+        .header-title {
             font-size: 22px;
             font-weight: bold;
-            margin-bottom: 5px;
+            color: #444;
         }
+
+        /* INVOICE INFO BOX */
+        .invoice-meta {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #444;
+            text-align: center;
+        }
+
+        /* SECTION TITLE */
         .section-title {
+            margin-top: 25px;
+            font-size: 15px;
             font-weight: bold;
-            margin-top: 20px;
-            font-size: 16px;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 3px;
+            color: #555;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #EEE;
         }
+
+        /* CUSTOMER BOX */
+        .customer-box {
+            padding: 10px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* PRODUCT TABLE */
         table {
             width: 100%;
-            margin-top: 15px;
             border-collapse: collapse;
+            margin-top: 15px;
         }
-        table th, table td {
-            padding: 8px 10px;
-            border: 1px solid #ddd;
+
+        table thead th {
+            background: #F7F7F7;
+            padding: 10px;
+            font-size: 13px;
+            text-align: left;
+            color: #555;
+            border-bottom: 1px solid #EEE;
         }
-        .total {
+
+        table tbody td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #EEE;
+            font-size: 13px;
+        }
+
+        /* TOTAL SUMMARY BOX */
+        .summary-box {
+            width: 250px;
+            margin-left: auto;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #DDD;
+            border-radius: 8px;
+            background: #FBFBFB;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .summary-row strong {
+            font-weight: bold;
+            color: #444;
+        }
+
+        .grand-total {
             font-size: 16px;
             font-weight: bold;
-            text-align: right;
+            margin-top: 10px;
+            border-top: 1px solid #DDD;
             padding-top: 10px;
-        }
-        .text-right {
             text-align: right;
+            color: #000;
         }
-    </style>
 
+        /* SIGNATURE */
+        .signature {
+            margin-top: 55px;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 50px;
+            font-size: 12px;
+            text-align: center;
+            color: #777;
+        }
+
+    </style>
 </head>
+
 <body>
 
-<div class="invoice-box">
+<div class="wrapper">
 
-    <!-- Header -->
-    <table width="100%">
-        <tr>
-            <td>
-                <h2 style="color:#4F46E5;">GirlsVillaBoutique</h2>
-                <small>Dhupuri District · Assam</small>
-            </td>
-            <td class="text-right">
-                <h3>Invoice #{{ $order->id }}</h3>
-                Date: {{ $order->created_at->format('d M Y') }}
-            </td>
-        </tr>
-    </table>
+    <!-- HEADER -->
+    <div class="header">
+        <img src="{{ public_path('storage/logo.jpg') }}">
+        <div class="header-title">GirlsVillaBoutique</div>
+        <small>Dhubri District, Assam</small>
+    </div>
 
-    <!-- Customer -->
-    <div class="section-title">Customer Information</div>
+    <!-- INVOICE META -->
+    <div class="invoice-meta">
+        <strong>Invoice #{{ $order->id }}</strong> • 
+        {{ $order->created_at->format('d M Y') }}
+    </div>
 
-    <p><strong>Name:</strong> {{ $order->name }}</p>
-    <p><strong>Email:</strong> {{ $order->email }}</p>
-    <p><strong>Phone:</strong> {{ $order->phone }}</p>
-    <p>
-        <strong>Address:</strong>  
-        {{ $order->address }}, {{ $order->city }}, {{ $order->pincode }}
-    </p>
+    <!-- CUSTOMER INFORMATION -->
+    <div class="section-title">Customer Details</div>
 
-    <!-- Items -->
-    <div class="section-title">Order Items</div>
+    <div class="customer-box">
+        <strong>Name:</strong> {{ $order->name }} <br>
+        <strong>Email:</strong> {{ $order->email }} <br>
+        <strong>Phone:</strong> {{ $order->phone }} <br>
+        <strong>Address:</strong> {{ $order->address }}, {{ $order->city }} - {{ $order->pincode }}
+    </div>
+
+    <!-- ORDER ITEMS -->
+    <div class="section-title">
+    Order Summary — <span style="color:#8B3FD9;">Order #{{ $order->id }}</span>
+</div>
+
 
     <table>
-        <thead style="background: #f0f0f0;">
+        <thead>
             <tr>
+                <th>Product Code</th>
                 <th>Product</th>
+                <th>Size</th>
+                <th>Unit Price</th>
                 <th>Qty</th>
-                <th>Price</th>
-                <th>Total</th>
+                <th>Subtotal</th>
             </tr>
         </thead>
 
         <tbody>
             @foreach($order->items as $item)
             <tr>
+                <td>{{ $item->product->product_code }}</td>
                 <td>{{ $item->product->name }}</td>
-                <td>{{ $item->quantity }}</td>
+                <td>{{ $item->size ?? '-' }}</td>
                 <td>₹{{ number_format($item->price) }}</td>
-                <td>₹{{ number_format($item->quantity * $item->price) }}</td>
+                <td>{{ $item->quantity }}</td>
+                <td>₹{{ number_format($item->price * $item->quantity) }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
 
-    <!-- Total -->
-    <p class="total">
-        Total Amount: ₹{{ number_format($order->total_amount) }}
-    </p>
+    <!-- TOTAL BOX -->
+    <div class="summary-box">
+        @php
+            $sub = $order->items->sum(fn($i) => $i->price * $i->quantity);
+        @endphp
+
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <strong>₹{{ number_format($sub) }}</strong>
+        </div>
+
+        <div class="summary-row">
+            <span>Shipping</span>
+            <strong>FREE</strong>
+        </div>
+
+        <div class="grand-total">
+            Grand Total: ₹{{ number_format($order->total_amount) }}
+        </div>
+    </div>
+
+    <!-- SIGNATURE -->
+    <div class="signature">
+        __________________________<br>
+        <strong>Authorized Signature</strong>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        Thank you for shopping with <strong>GirlsVillaBoutique</strong> ❤️ <br>
+        Need help? Email us at support@GirlsVillaBoutique.com
+    </div>
 
 </div>
 

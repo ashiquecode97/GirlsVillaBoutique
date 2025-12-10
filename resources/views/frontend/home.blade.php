@@ -46,7 +46,19 @@
             {{-- Product Info --}}
             <h3 class="text-lg font-semibold mt-3">{{ $product->name }}</h3>
             <p class="text-gray-600 text-sm">{{ Str::limit($product->description, 50) }}</p>
+                        {{-- Show Sizes --}}
+            @if($product->size)
+                <div class="mt-2">
+                    <span class="text-xs text-gray-500 font-semibold">Sizes:</span>
 
+                    @foreach(explode(',', $product->size) as $size)
+                        <span class="inline-block px-2 py-0.5 bg-gray-100 
+                                    border border-gray-300 rounded-md text-xs text-gray-700 mr-1 mt-1">
+                            {{ $size }}
+                        </span>
+                    @endforeach
+                </div>
+            @endif
             <div class="flex justify-between items-center mt-4">
                 <span class="text-lg font-bold text-green-600">
                     ₹{{ number_format($product->price) }}

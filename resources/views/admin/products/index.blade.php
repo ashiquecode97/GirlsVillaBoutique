@@ -36,10 +36,12 @@
             <table class="min-w-full text-sm text-left">
                 <thead class="bg-gray-50 border-b border-gray-200">
                     <tr>
-                        <th class="px-5 py-3 font-semibold text-gray-600">ID</th>
+                        <th class="px-5 py-3 font-semibold text-gray-600">SL</th>
+                        <th class="px-5 py-3 font-semibold text-gray-600">Product Code</th>
                         <th class="px-5 py-3 font-semibold text-gray-600">Image</th>
                         <th class="px-5 py-3 font-semibold text-gray-600">Name</th>
                         <th class="px-5 py-3 font-semibold text-gray-600">Price</th>
+                        <th class="px-5 py-3 font-semibold text-gray-600">Size</th>
                         <th class="px-5 py-3 font-semibold text-gray-600">Stock</th>
                         <th class="px-5 py-3 font-semibold text-gray-600">Status</th>
                         <th class="px-5 py-3 font-semibold text-gray-600 text-right">Actions</th>
@@ -47,9 +49,17 @@
                 </thead>
 
                 <tbody class="divide-y divide-gray-100">
-                    @forelse($products as $product)
+                    @forelse($products as $index => $product)
                         <tr class="hover:bg-gray-50 transition-colors">
-                            
+
+                            {{-- SL NUMBER --}}
+                            <td class="px-5 py-3 text-gray-700 font-medium">
+                                {{ $products->firstItem() + $index }}
+                            </td>
+
+                            <td class="px-5 py-3 text-gray-700 font-medium">
+                                {{ $product->product_code}}
+                            </td>
                             <td class="px-5 py-3 text-gray-700 font-medium">
                                 {{ $product->id }}
                             </td>
@@ -57,7 +67,7 @@
                             <td class="px-5 py-3">
                                 @if($product->image)
                                     <img src="{{ asset('storage/'.$product->image) }}"
-                                         class="w-12 h-12 object-cover rounded-md shadow-sm border border-gray-200">
+                                        class="w-12 h-12 object-cover rounded-md shadow-sm border border-gray-200">
                                 @else
                                     <span class="text-xs text-gray-400">No image</span>
                                 @endif
@@ -75,6 +85,18 @@
                             <td class="px-5 py-3 text-gray-700 font-medium">
                                 ₹{{ $product->price }}
                             </td>
+                            <td class="px-5 py-3 text-gray-700">
+                                @if($product->size)
+                                    @foreach(explode(',', $product->size) as $size)
+                                        <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs mr-1">
+                                            {{ $size }}
+                                        </span>
+                                    @endforeach
+                                @else
+                                    <span class="text-gray-400 text-xs">No Size</span>
+                                @endif
+                            </td>
+
 
                             <td class="px-5 py-3 text-gray-700">
                                 {{ $product->stock }}
@@ -95,26 +117,22 @@
                             <td class="px-5 py-3 text-right">
                                 <div class="inline-flex items-center gap-3">
 
-                                    {{-- EDIT BUTTON --}}
+                                    {{-- EDIT --}}
                                     <a href="{{ route('admin.products.edit', $product) }}"
                                         class="px-4 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 
-                                            text-white rounded-md shadow hover:shadow-lg 
-                                            hover:-translate-y-0.5 hover:scale-105
-                                            transition-all duration-300 text-xs font-semibold">
+                                        text-white rounded-md shadow hover:shadow-lg 
+                                        hover:-translate-y-0.5 hover:scale-105 transition-all duration-300 text-xs font-semibold">
                                         Edit
                                     </a>
 
-                                    {{-- DELETE BUTTON --}}
-                                    <form action="{{ route('admin.products.destroy', $product) }}"
-                                          method="POST"
-                                          onsubmit="return confirm('Delete this product?');">
+                                    {{-- DELETE --}}
+                                    <form action="{{ route('admin.products.destroy', $product) }}" method="POST"
+                                        onsubmit="return confirm('Delete this product?');">
                                         @csrf
                                         @method('DELETE')
-
                                         <button class="px-4 py-1.5 bg-gradient-to-r from-red-500 to-red-700 
                                             text-white rounded-md shadow hover:shadow-lg 
-                                            hover:-translate-y-0.5 hover:scale-105
-                                            transition-all duration-300 text-xs font-semibold">
+                                            hover:-translate-y-0.5 hover:scale-105 transition-all duration-300 text-xs font-semibold">
                                             Delete
                                         </button>
                                     </form>
@@ -125,12 +143,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-5 py-6 text-center text-gray-500 italic">
+                            <td colspan="8" class="px-5 py-6 text-center text-gray-500 italic">
                                 No products found.
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
+
             </table>
         </div>
 

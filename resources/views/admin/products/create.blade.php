@@ -40,6 +40,31 @@
                        focus:ring-2 focus:ring-indigo-400 outline-none transition">
                 @error('stock') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
             </div>
+            {{-- Sizes --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Available Sizes</label>
+
+                    <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
+
+                        @php 
+                            $sizes = ['XS','S','M','L','XL','XXL'];
+                        @endphp
+
+                        @foreach($sizes as $size)
+                            <label class="flex items-center space-x-2 bg-gray-50 px-3 py-2 rounded border cursor-pointer">
+                                <input type="checkbox" name="size[]" value="{{ $size }}" 
+                                    class="text-indigo-600 focus:ring-indigo-500">
+                                <span class="text-sm text-gray-700">{{ $size }}</span>
+                            </label>
+                        @endforeach
+
+                    </div>
+
+                    @error('size') 
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p> 
+                    @enderror
+                </div>
+
 
             <div class="flex items-center gap-2 pt-6">
                 <label class="block mt-3">

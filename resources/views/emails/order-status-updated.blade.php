@@ -1,22 +1,68 @@
 @component('mail::message')
-# 📦 Order Status Update
 
-Hi {{ $order->name }},
+# GirlsVilla Boutique  
+Dhubri District, Assam  
 
-Your order **#{{ $order->id }}** status has been updated.
+---
 
-### Previous Status:
-**{{ ucfirst($oldStatus) }}**
+# 📦 Order Status Updated
 
-### New Status:
-**{{ ucfirst($newStatus) }}**
+Hi **{{ $order->name }}**,  
+Your order **#{{ $order->id }}** has been updated.
+
+---
+
+## 🔄 Status Update
+- **Previous Status:** {{ ucfirst($oldStatus) }}
+- **New Status:** **{{ ucfirst($newStatus) }}**
+
+---
+
+## 🧾 Order Details
 
 @component('mail::panel')
-Total Amount: ₹{{ number_format($order->total_amount) }}
+**Order ID:** #{{ $order->id }}  
+**Order Date:** {{ $order->created_at->format('d M Y') }}  
+**Payment Method:** **{{ strtoupper($order->payment_method) }}**
 @endcomponent
 
-We will notify you of further updates.
+---
 
-Thanks,  
+## 🛍️ Items in Your Order
+
+@foreach($order->items as $item)
+**{{ $item->product->name }}**  
+- Size: {{ $item->size ?? '-' }}  
+- Qty: {{ $item->quantity }}  
+- Price: ₹{{ number_format($item->price) }}  
+- Subtotal: ₹{{ number_format($item->price * $item->quantity) }}
+
+---
+@endforeach
+
+## 💰 Payment Summary
+- **Subtotal:** ₹{{ number_format($order->items->sum(fn($i) => $i->price * $i->quantity)) }}
+- **Shipping:** FREE
+- **Grand Total:** **₹{{ number_format($order->total_amount) }}**
+
+---
+
+# 🚚 What Happens Next?
+
+We are preparing your order.  
+You will receive updates when your order is:
+
+- ✔ Packed 
+- ✔ Shipped  
+- ✔ Out for Delivery  
+- ✔ Delivered  
+
+---
+
+Thanks for shopping with **GirlsVilla Boutique** 💜  
+If you need help, reply to this email or call us.
+
+📞 **7002233886**  
+🌸 With love,  
 **GirlsVilla Boutique**
 @endcomponent
