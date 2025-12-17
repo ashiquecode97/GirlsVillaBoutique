@@ -28,36 +28,17 @@ Your order has been successfully placed.
 
 ---
 
-# 📦 Ordered Items
+## 🛍️ Items in Your Order
 
-<!-- PERFECT RESPONSIVE TABLE -->
-<table width="100%" cellpadding="8" cellspacing="0" 
-       style="border-collapse:collapse; font-size:14px; margin-top:10px;">
-    <thead>
-        <tr style="background:#F3E8FF; color:#4A007D; text-align:left;">
-            <th>Code</th>
-            <th>Product</th>
-            <th>Size</th>
-            <th>Qty</th>
-            <th>Price</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
+@foreach($order->items as $item)
+**{{ $item->product->name }}**  
+- Size: {{ $item->size ?? '-' }}  
+- Qty: {{ $item->quantity }}  
+- Price: ₹{{ number_format($item->price) }}  
+- Subtotal: ₹{{ number_format($item->price * $item->quantity) }}
 
-    <tbody>
-        @foreach ($order->items as $item)
-        <tr style="border-bottom:1px solid #EEE;">
-            <td>{{ $item->product->product_code }}</td>
-            <td>{{ $item->product->name }}</td>
-            <td>{{ $item->size ?? '-' }}</td>
-            <td>{{ $item->quantity }}</td>
-            <td>₹{{ number_format($item->price) }}</td>
-            <td>₹{{ number_format($item->quantity * $item->price) }}</td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-
+---
+@endforeach
 ---
 
 @php

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\ShopController;
 use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 // FRONTEND
@@ -19,10 +20,11 @@ Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])-
 Route::get('/my-orders', [UserOrderController::class, 'index'])
     ->middleware('auth')
     ->name('user.orders');
-    Route::get('/my-orders/{order}', 
-    [UserOrderController::class, 'show'])
+Route::get('/my-orders/{order}', [UserOrderController::class, 'show'])
     ->name('user.orders.show')
     ->middleware('auth');
+Route::post('/orders/{order}/cancel', [UserOrderController::class, 'cancel'])
+        ->name('user.orders.cancel');   
 
 
 
@@ -34,6 +36,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::delete('/cart/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::put('/cart/update/{cartItem}', [CartController::class, 'update'])
+    ->name('cart.update');
+
+    Route::get('/wishlist', [WishlistController::class, 'index'])
+        ->name('wishlist.index');
+
+    Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])
+        ->name('wishlist.toggle');
+
+    Route::delete('/wishlist/{wishlist}', [WishlistController::class, 'destroy'])
+        ->name('wishlist.destroy');
+  
+        
 });
 
 // ADMIN AUTH

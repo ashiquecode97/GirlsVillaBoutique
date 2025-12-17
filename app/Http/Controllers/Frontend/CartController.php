@@ -20,27 +20,37 @@ class CartController extends Controller
         
     public function add(Request $request, Product $product)
     {
+        // ❌ Block if out of stock
+        if ($product->stock <= 0) {
+            return redirect()->back()
+                ->with('error', 'This product is out of stock.');
+        }
+
         $request->validate([
             'selected_size' => 'required|string'
         ]);
 
         $size = $request->selected_size;
 
-        // Check if SAME product + SAME size already exists in cart
         $existingItem = CartItem::where('user_id', auth()->id())
             ->where('product_id', $product->id)
             ->where('size', $size)
             ->first();
 
         if ($existingItem) {
-            // Update quantity instead of creating duplicate
+
+            // ❌ Prevent exceeding stock
+            if ($existingItem->quantity + 1 > $product->stock) {
+                return redirect()->back()
+                    ->with('error', 'No more stock available.');
+            }
+
             $existingItem->quantity += 1;
             $existingItem->save();
 
             return redirect()->back()->with('success', 'Quantity updated in your cart');
         }
 
-        // Create NEW cart row if size OR product is different
         CartItem::create([
             'user_id'    => auth()->id(),
             'product_id' => $product->id,
@@ -51,20 +61,33 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Product added to cart');
     }
 
-        public function update(Request $request, CartItem $cartItem)
-    {
-        $request->validate([
-            'quantity' => 'required|integer|min:1'
-        ]);
 
-        $cartItem->quantity = $request->quantity;
+      public function update(Request $request, CartItem $cartItem)
+    {
+        // Security: ensure user owns this cart item
+        if ($cartItem->user_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $quantity = max(1, (int) $request->quantity);
+
+        // Optional: stock check
+        if ($cartItem->product->stock < $quantity) {
+            return response()->json([
+                'error' => 'Not enough stock available'
+            ], 422);
+        }
+
+        // ✅ UPDATE DB
+        $cartItem->quantity = $quantity;
         $cartItem->save();
 
         return response()->json([
             'success' => true,
-            'subtotal' => $cartItem->quantity * $cartItem->product->price,
+            'quantity' => $cartItem->quantity
         ]);
     }
+
 
 
         public function remove(CartItem $cartItem)

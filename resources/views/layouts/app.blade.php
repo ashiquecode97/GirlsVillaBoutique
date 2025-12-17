@@ -13,12 +13,14 @@
 <body class="bg-gray-100 text-gray-800">
 
     <!-- SOUND -->
-    <audio id="toast-sound" src="{{ asset('sounds/notify.OGG') }}"></audio>
+    {{-- <audio id="toast-sound" src="{{ asset('sounds/notify.OGG') }}"></audio> --}}
+    
 
     <div class="min-h-screen flex flex-col">
 
         {{-- NAV BAR --}}
         @include('layouts.navigation')
+        {{-- <audio id="toast-sound" src="{{ asset('sounds/notify.OGG') }}"></audio> --}}
 
         {{-- TOAST ALERTS --}}
         <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3">
@@ -69,7 +71,7 @@
         </script>
 
         {{-- PAGE CONTENT --}}
-        <main class="flex-grow container mx-auto px-4 py-6">
+        <main class="flex-grow min-h-screen container mx-auto px-4 py-6">
             <div class="bg-white rounded-lg shadow p-6">
                 @yield('content')
             </div>
@@ -81,5 +83,21 @@
         </footer>
 
     </div>
+    <script>
+    window.addEventListener('pageshow', () => {
+        document.body.style.overflow = '';
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.body.style.opacity = '1';
+    });
+
+    if (!document.hidden) {
+    sound.play().catch(() => {});
+}
+
+</script>
+
 </body>
 </html>

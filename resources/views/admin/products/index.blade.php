@@ -38,8 +38,8 @@
                     <tr>
                         <th class="px-5 py-3 font-semibold text-gray-600">SL</th>
                         <th class="px-5 py-3 font-semibold text-gray-600">Product Code</th>
+                            <th class="px-5 py-3 font-semibold text-gray-600">Name</th>
                         <th class="px-5 py-3 font-semibold text-gray-600">Image</th>
-                        <th class="px-5 py-3 font-semibold text-gray-600">Name</th>
                         <th class="px-5 py-3 font-semibold text-gray-600">Price</th>
                         <th class="px-5 py-3 font-semibold text-gray-600">Size</th>
                         <th class="px-5 py-3 font-semibold text-gray-600">Stock</th>
@@ -60,10 +60,17 @@
                             <td class="px-5 py-3 text-gray-700 font-medium">
                                 {{ $product->product_code}}
                             </td>
-                            <td class="px-5 py-3 text-gray-700 font-medium">
+                            {{-- <td class="px-5 py-3 text-gray-700 font-medium">
                                 {{ $product->id }}
+                            </td> --}}
+                             <td class="px-5 py-3">
+                                <div class="font-semibold text-gray-800">
+                                    {{ $product->name }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    {{ Str::limit($product->description, 40) }}
+                                </div>
                             </td>
-
                             <td class="px-5 py-3">
                                 @if($product->image)
                                     <img src="{{ asset('storage/'.$product->image) }}"
@@ -73,14 +80,7 @@
                                 @endif
                             </td>
 
-                            <td class="px-5 py-3">
-                                <div class="font-semibold text-gray-800">
-                                    {{ $product->name }}
-                                </div>
-                                <div class="text-xs text-gray-500">
-                                    {{ Str::limit($product->description, 40) }}
-                                </div>
-                            </td>
+                           
 
                             <td class="px-5 py-3 text-gray-700 font-medium">
                                 ₹{{ $product->price }}

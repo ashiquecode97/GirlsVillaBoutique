@@ -22,6 +22,7 @@
                 class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow hover:bg-gray-300">
                 🖨 Print
             </button>
+            
         </div>
     </div>
 

@@ -2,22 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================
+   GLOBAL LAYOUT FIXES
+   ========================= */
 
-/* custom animation */
-/* 
-.hover-lift {
-    transition: all .25s ease;
+/* Prevent page width jump (no screen shake) */
+html {
+    overflow-y: scroll;
 }
 
-.hover-lift:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-} */
-.hover-lift {
-    transition: all .25s ease;
+/* Prevent horizontal shake + allow soft transitions */
+body {
+    overflow-x: hidden;
+    transition: opacity 0.15s ease-in-out;
 }
+
+/* =========================
+   UI EFFECTS
+   ========================= */
+
+/* Hover lift animation */
+.hover-lift {
+    transition: all 0.25s ease;
+}
+
 .hover-lift:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
-/* CheckoutController@placeOrder */

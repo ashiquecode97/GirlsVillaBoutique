@@ -50,6 +50,29 @@
                         Cart
                         <span class="absolute left-0 bottom-0 w-0 h-0.5 bg-indigo-600 group-hover:w-full transition-all"></span>
                     </a>
+                    <a href="{{ route('wishlist.index') }}"
+                        class="relative flex items-center justify-center text-gray-700 hover:text-pink-600 transition">
+
+                            <!-- Heart Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-6 w-6"
+                                fill="currentColor"
+                                viewBox="0 0 24 24">
+                                <path d="M12 21s-6.716-4.92-9.543-8.086C-1.02 9.003 1.406 3 6.75 3c2.366 0 3.996 1.46 5.25 3.02C13.254 4.46 14.884 3 17.25 3 22.594 3 25.02 9.003 21.543 12.914 18.716 16.08 12 21 12 21z"/>
+                            </svg>
+
+                            <!-- Badge -->
+                            @if($wishlistCount > 0)
+                                <span
+                                    class="absolute -top-2 -right-2
+                                        bg-pink-600 text-white text-xs
+                                        min-w-[18px] h-[18px]
+                                        flex items-center justify-center
+                                        rounded-full font-bold">
+                                    {{ $wishlistCount }}
+                                </span>
+                            @endif
+                    </a>
                     @endauth
                 </div>
             </div>

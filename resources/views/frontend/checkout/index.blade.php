@@ -9,8 +9,15 @@
     <!-- LEFT: ADDRESS + PAYMENT FORM -->
     <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border">
 
+
         <form method="POST" action="{{ route('checkout.placeOrder') }}" class="space-y-5">
             @csrf
+            @if(request('buy_now'))
+                <input type="hidden" name="buy_now" value="1">
+                <input type="hidden" name="product_id" value="{{ $cartItems[0]->product->id }}">
+                <input type="hidden" name="qty" value="{{ $cartItems[0]->quantity }}">
+                <input type="hidden" name="size" value="{{ $cartItems[0]->size }}">
+            @endif
 
             <!-- Name -->
             <div>
@@ -70,12 +77,20 @@
     <div class="bg-white p-6 rounded-xl shadow-md border">
         <h2 class="text-xl font-bold text-gray-800 mb-4">Order Summary</h2>
 
-        @foreach($cartItems as $item)
-            <div class="flex justify-between mb-2 text-gray-700">
-                <span>{{ $item->product->name }} x {{ $item->quantity }}</span>
+       @foreach($cartItems as $item)
+            <div class="flex justify-between mb-2">
+                <span>
+                    {{ $item->product->name }}
+                    <span class="text-xs text-gray-500">Qty {{ $item->quantity }}</span>
+                    @if($item->size)
+                        <span class="text-xs">(Size {{ $item->size }})</span>
+                    @endif
+                </span>
                 <span>₹{{ number_format($item->quantity * $item->product->price) }}</span>
             </div>
         @endforeach
+
+
 
         <hr class="my-3">
 
