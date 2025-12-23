@@ -37,7 +37,7 @@
                    transition shadow-sm">
             <option value="">All Status</option>
             <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
-            <option value="Processing" {{ request('status') == 'Processing' ? 'selected' : '' }}>Processing</option>
+            <option value="Processing" {{ request('status') == 'success' ? 'selected' : '' }}>success</option>
             <option value="Delivered" {{ request('status') == 'Delivered' ? 'selected' : '' }}>Delivered</option>
         </select>
 

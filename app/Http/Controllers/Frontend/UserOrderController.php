@@ -7,6 +7,8 @@ use App\Mail\OrderCancelledMail;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class UserOrderController extends Controller
 {
@@ -38,40 +40,59 @@ class UserOrderController extends Controller
 
     public function cancel(Order $order)
     {
-        // Security: only owner can cancel
+        // 🔒 Security: only owner can cancel
         if ($order->user_id !== auth()->id()) {
             abort(403);
         }
 
-        // Allowed only for Pending / Processing
-        if (!in_array($order->status, ['Pending', 'Processing'])) {
-            return back()->with('error', 'This order cannot be cancelled.');
+        
+        $status = strtolower($order->status);
+
+        // ❌ Block cancel after  delivered / cancelled
+        if (in_array($order->status, [ 'delivered', 'cancelled'])) {
+            return back()->with('error', '❌ Once an order is success or delivered, it must NOT be cancelled');
         }
 
-        // 🔒 24 HOURS CHECK
+        // ⏱ Optional: 24 hours cancellation window (only for pending)
         if ($order->created_at->diffInHours(now()) > 24) {
-            return back()->with('error', 'Cancellation period (24 hours) has expired.');
+            return back()->with('error', '⏱ Cancellation period (24 hours) has expired.');
         }
 
         DB::transaction(function () use ($order) {
 
-            // Restore stock
+            // 🔄 Restore stock
             foreach ($order->items as $item) {
                 if ($item->product) {
                     $item->product->increment('stock', $item->quantity);
                 }
             }
 
-            // Update status
+            // ✅ Update order status (use lowercase for consistency)
             $order->update([
-                'status' => 'Cancelled'
+                'status' => 'cancelled',
             ]);
         });
 
-        // 📧 SEND CANCEL EMAIL
-    Mail::to($order->email)->send(new OrderCancelledMail($order));
+            // 📧 SEND CANCEL EMAIL
+        Mail::to($order->email)->send(new OrderCancelledMail($order));
 
         return back()->with('success', 'Order cancelled successfully.');
     }
+
+        public function invoice(Order $order)
+    {
+        // 🔐 Security: only owner can download
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $order->load('items.product');
+
+        $pdf = Pdf::loadView('user.orders.invoice', compact('order'))
+                ->setPaper('a4', 'portrait');
+
+        return $pdf->download('invoice-'.$order->id.'.pdf');
+    }
+
 
 }

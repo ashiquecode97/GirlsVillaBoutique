@@ -24,8 +24,8 @@
             <select name="status"
                     class="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition">
                 <option value="pending"    {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Processing</option>
-                <option value="success"    {{ $order->status == 'success' ? 'selected' : '' }}>Success</option>
+                <option value="processing" {{ $order->status == 'success' ? 'selected' : '' }}>Success</option>
+                <option value="success"    {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
                 <option value="cancelled"  {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
             </select>
         </div>

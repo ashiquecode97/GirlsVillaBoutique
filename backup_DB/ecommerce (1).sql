@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 10, 2025 at 10:02 AM
+-- Generation Time: Dec 20, 2025 at 06:59 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -55,6 +55,15 @@ CREATE TABLE `cache` (
   `expiration` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('laravel-cache-admin.dashboard.bar.v1', 'a:7:{s:6:\"labels\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:7:{i:0;s:10:\"2025-12-14\";i:1;s:10:\"2025-12-15\";i:2;s:10:\"2025-12-16\";i:3;s:10:\"2025-12-17\";i:4;s:10:\"2025-12-18\";i:5;s:10:\"2025-12-19\";i:6;s:10:\"2025-12-20\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:9:\"salesData\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:7:{i:0;i:0;i:1;i:0;i:2;i:0;i:3;i:0;i:4;i:0;i:5;i:0;i:6;s:4:\"8198\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:12:\"statusCounts\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:2:{s:7:\"pending\";i:1;s:7:\"success\";i:1;}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:13:\"totalProducts\";i:8;s:14:\"activeProducts\";i:8;s:10:\"todaySales\";s:4:\"8198\";s:12:\"monthlySales\";s:4:\"8198\";}', 1766254907),
+('laravel-cache-admin.dashboard.stats', 'a:6:{s:13:\"totalProducts\";i:8;s:14:\"activeProducts\";i:8;s:10:\"todaySales\";i:0;s:12:\"monthlySales\";i:0;s:11:\"salesLabels\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:0:{}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:9:\"salesData\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:0:{}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}}', 1766255083),
+('laravel-cache-admin.dashboard.v1', 'a:6:{s:6:\"labels\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:7:{i:0;s:10:\"2025-12-14\";i:1;s:10:\"2025-12-15\";i:2;s:10:\"2025-12-16\";i:3;s:10:\"2025-12-17\";i:4;s:10:\"2025-12-18\";i:5;s:10:\"2025-12-19\";i:6;s:10:\"2025-12-20\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:10:\"statusData\";a:4:{s:7:\"Pending\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:1:{s:10:\"2025-12-20\";i:1;}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:7:\"success\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:0:{}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:9:\"Delivered\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:0:{}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:9:\"cancelled\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:0:{}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}}s:13:\"totalProducts\";i:8;s:14:\"activeProducts\";i:8;s:10:\"todaySales\";s:4:\"6998\";s:12:\"monthlySales\";s:4:\"6998\";}', 1766254355);
+
 -- --------------------------------------------------------
 
 --
@@ -88,8 +97,7 @@ CREATE TABLE `cart_items` (
 --
 
 INSERT INTO `cart_items` (`id`, `user_id`, `product_id`, `size`, `quantity`, `created_at`, `updated_at`) VALUES
-(2, 2, 1, NULL, 1, '2025-12-03 12:52:16', '2025-12-03 12:52:16'),
-(55, 1, 2, 'S', 1, '2025-12-09 15:15:43', '2025-12-09 15:15:43');
+(2, 2, 1, NULL, 1, '2025-12-03 12:52:16', '2025-12-03 12:52:16');
 
 -- --------------------------------------------------------
 
@@ -189,7 +197,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (10, '2025_12_04_184633_create_order_items_table', 4),
 (11, '2025_12_09_161041_add_size_and_product_code_to_products_table', 5),
 (12, '2025_12_09_172535_add_size_to_cart_items_table', 6),
-(13, '2025_12_09_184808_add_size_to_order_items_table', 7);
+(13, '2025_12_09_184808_add_size_to_order_items_table', 7),
+(14, '2025_12_17_164558_create_wishlists_table', 8),
+(15, '2025_12_19_204045_add_payment_verified_to_orders', 9);
 
 -- --------------------------------------------------------
 
@@ -210,19 +220,17 @@ CREATE TABLE `orders` (
   `total_amount` int(11) NOT NULL,
   `status` varchar(255) NOT NULL DEFAULT 'Pending',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `payment_verified` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `name`, `email`, `address`, `city`, `pincode`, `phone`, `payment_method`, `total_amount`, `status`, `created_at`, `updated_at`) VALUES
-(19, 1, 'kambulaaaaaaaaaaaaaaaaa', 'ashkmostafa23@gmail.com', 'aaaaaasdddddddddddddddddddd', 'dhubri', '783324', '7002233886', 'cod', 4866, 'Pending', '2025-12-09 13:09:34', '2025-12-09 13:09:34'),
-(20, 1, 'kambul', 'ashkmostafa23@gmail.com', 'aaaaaaaaaaaaaaaaaa', 'dhubri', '783324', '7002233886', 'cod', 10954, 'processing', '2025-12-09 13:16:16', '2025-12-09 14:31:22'),
-(21, 1, 'kambul', 'ashkmostafa23@gmail.com', 'aaaaaaaaaaaaaaaaaa', 'dhubri', '783324', '7002233886', 'cod', 10954, 'success', '2025-12-09 13:16:39', '2025-12-09 14:31:02'),
-(27, 1, 'Ashique Mostafa', 'ashkmostafa23@gmail.com', 'fwhhgg', 'nkknk', '783324', '7002233886', 'cod', 3199, 'Pending', '2025-12-09 15:11:51', '2025-12-09 15:11:51'),
-(28, 1, 'sarmin', 'ashkmostafa23@gmail.com', 'fegae', 'ge', '783324', '8723948341', 'cod', 1222, 'Pending', '2025-12-09 15:14:10', '2025-12-09 15:14:10');
+INSERT INTO `orders` (`id`, `user_id`, `name`, `email`, `address`, `city`, `pincode`, `phone`, `payment_method`, `total_amount`, `status`, `created_at`, `updated_at`, `payment_verified`) VALUES
+(44, 1, 'Kambul Hassan', 'ashkmostafa23@gmail.com', 'ProtapGanj', 'Dhubri', '782235', '7002233886', 'online', 6998, 'success', '2025-12-20 11:56:57', '2025-12-20 12:15:28', 1),
+(45, 1, 'Ashique', 'ashkmostafa23@gmail.com', 'wqqd', 'Agomani', '782235', '7002233886', 'cod', 1200, 'pending', '2025-12-20 12:13:33', '2025-12-20 12:13:33', 1);
 
 -- --------------------------------------------------------
 
@@ -246,9 +254,9 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `quantity`, `size`, `price`, `created_at`, `updated_at`) VALUES
-(32, 27, 5, 1, 'XL', 1999, '2025-12-09 15:11:51', '2025-12-09 15:11:51'),
-(33, 27, 2, 1, 'S', 1200, '2025-12-09 15:11:52', '2025-12-09 15:11:52'),
-(34, 28, 7, 1, 'M', 1222, '2025-12-09 15:14:10', '2025-12-09 15:14:10');
+(54, 44, 8, 2, 'M', 2499, '2025-12-20 11:56:57', '2025-12-20 11:56:57'),
+(55, 44, 3, 1, 'M', 2000, '2025-12-20 11:56:57', '2025-12-20 11:56:57'),
+(56, 45, 1, 1, 'M', 1200, '2025-12-20 12:13:33', '2025-12-20 12:13:33');
 
 -- --------------------------------------------------------
 
@@ -294,12 +302,14 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `product_code`, `name`, `description`, `price`, `stock`, `size`, `image`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'PRD-0001', 'Salawar suit', 'newly added', 1200, 7, NULL, 'products/Lf7VP4RzqUIlgiKZAUZubunF82DWddZQDTsUUv8T.jpg', 1, '2025-12-03 12:02:11', '2025-12-05 13:29:30'),
-(2, 'PRD-0002', 'kurti 200', 'new', 1200, 0, 'S', 'products/hVgFKSp93lGVMcbKpwH3GseHIbSnWpGWTgwp8gRi.jpg', 1, '2025-12-03 12:39:43', '2025-12-09 12:46:17'),
-(3, 'PRD-0003', 'orange kurti', 'nice kurti . sale in eid', 2000, 7, NULL, 'products/NW1MylOHM3j0TLw5prYvW7GWfXEBrzDH5ihV9qR6.jpg', 1, '2025-12-04 11:51:15', '2025-12-05 14:32:46'),
-(4, 'PRD-0004', 'blue kurti set', 'newle added on winter', 1499, 9, NULL, 'products/KNJkW3MEq1sBZ8nNReLdMQWskl0n3PauhgAIugLR.jpg', 1, '2025-12-05 05:30:40', '2025-12-05 14:16:52'),
-(5, 'PRD-0005', 'black pakistani suits', 'here some premium collection', 1999, 8, 'M,XL', 'products/8CkOAdVutTwtpxxapXGqOP76GCzCXs97ldBYqTZt.jpg', 1, '2025-12-05 05:31:32', '2025-12-09 15:11:51'),
-(7, 'GV-0006', 'Russian Plazo', 'vs', 1222, 0, 'S,M,L', 'products/HR7dFaZG0DYBCNR9X2lZfwEvxCSlA281lzYvhY5J.jpg', 1, '2025-12-09 11:14:46', '2025-12-09 12:46:17');
+(1, 'PRD-0001', 'Salawar suit', 'newly added', 1200, 2, 'M,L,XL', 'products/Lf7VP4RzqUIlgiKZAUZubunF82DWddZQDTsUUv8T.jpg', 1, '2025-12-03 12:02:11', '2025-12-20 12:13:33'),
+(2, 'PRD-0002', 'Stylish Dark Green Kurti Set', 'Newly Added', 1200, 0, 'S,M', 'products/hVgFKSp93lGVMcbKpwH3GseHIbSnWpGWTgwp8gRi.jpg', 1, '2025-12-03 12:39:43', '2025-12-19 15:53:33'),
+(3, 'PRD-0003', 'orange kurti', 'nice kurti . sale in eid', 2000, 3, 'M,L', 'products/NW1MylOHM3j0TLw5prYvW7GWfXEBrzDH5ihV9qR6.jpg', 1, '2025-12-04 11:51:15', '2025-12-20 11:56:57'),
+(4, 'PRD-0004', 'blue kurti set', 'newle added on winter', 1499, 5, 'S,M,L,XL', 'products/KNJkW3MEq1sBZ8nNReLdMQWskl0n3PauhgAIugLR.jpg', 1, '2025-12-05 05:30:40', '2025-12-18 10:11:46'),
+(5, 'PRD-0005', 'black pakistani suits', 'here some premium collection', 1999, 0, 'M,XL', 'products/8CkOAdVutTwtpxxapXGqOP76GCzCXs97ldBYqTZt.jpg', 1, '2025-12-05 05:31:32', '2025-12-18 10:11:46'),
+(7, 'GV-0006', 'Russian Plazo', 'vs', 1222, 3, 'S,M,L', 'products/HR7dFaZG0DYBCNR9X2lZfwEvxCSlA281lzYvhY5J.jpg', 1, '2025-12-09 11:14:46', '2025-12-20 11:57:56'),
+(8, 'GV-0008', 'Gorgeus Green Sari Premium', 'New collection', 2499, 5, 'S,M', 'products/0tDqBzpUVQuYlRoF8My5DVdGw6fm9OLW3zjt6QTL.jpg', 1, '2025-12-19 14:16:37', '2025-12-20 11:56:57'),
+(9, 'GV-0009', 'heavy Sari Premium collection', 'top brand', 3000, 9, 'S,M', 'products/SGS27T9rkegNNe87xDPiItOZmGf1H5WRsL778s82.jpg', 1, '2025-12-19 14:17:26', '2025-12-19 16:06:32');
 
 -- --------------------------------------------------------
 
@@ -321,8 +331,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('kws2KGmIwq0id6UUI3n5w6ahlutLuprwoFgrxfXf', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiS2VzWVRUbUlGdUp4OWk3S21vRlptamFPU0NxcEtTYjhJY2sxeEE2VyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0IjtzOjU6InJvdXRlIjtzOjEwOiJjYXJ0LmluZGV4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1765313147),
-('TVFaJsZLHEl9ZhglvYTvsMeOPGCnR63Xxf7rYRBF', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiWXpncXFXZnJnN3ppUHhnZ1kyZnRYaTg0d1BFR25DRXlJTE82NUczMiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9vcmRlcnMvMjgiO3M6NToicm91dGUiO3M6MTc6ImFkbWluLm9yZGVycy5zaG93Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czoxNToiYWRtaW5fbG9nZ2VkX2luIjtiOjE7czo4OiJhZG1pbl9pZCI7aToxO30=', 1765313086);
+('kfTGxzcydw1frFahskVCrezS6ms052BealKDbGyF', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiTkY3VHUwRkNnY2E2R2pTQ3NGS2FVcUs0NG12MXJuQ0F1REp5emQwZSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9teS1vcmRlcnMiO3M6NToicm91dGUiO3M6MTE6InVzZXIub3JkZXJzIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1766252624),
+('XxYjW2MqUnadaHsY8J2EFOWbxoNVtM5sqk2NALEz', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoiZTVjbzRnZlJyRklYTzZDNE1uc0FRVERDYTVXWkVTTGRQMEFMZ01lViI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NTA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9vcmRlcnM/c2VhcmNoPSZzdGF0dXM9IjtzOjU6InJvdXRlIjtzOjE4OiJhZG1pbi5vcmRlcnMuaW5kZXgiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO3M6MTU6ImFkbWluX2xvZ2dlZF9pbiI7YjoxO3M6ODoiYWRtaW5faWQiO2k6MTt9', 1766253521);
 
 -- --------------------------------------------------------
 
@@ -350,6 +360,28 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `re
 (2, 'Ashique Mostafa', 'admin@app.com', NULL, '$2y$12$JD/4yduXN8h/iHp0CJpNCOttFVFrY75udB5uftyr.cg7C8tDxUDF2', 'nNp1NRjGiaoPh5nHKjRqMFF4ufuUlYe78oxJ8bbIhupQhdwlxINRlqjxzmMe', '2025-12-03 10:22:24', '2025-12-03 10:22:24'),
 (3, 'user', 'ashk@gmail.com', NULL, '$2y$12$nNluOfyZbcBW3HT5VmjLmOsnaICywa3g9iPwWP9Oy0S15nEpeY7a.', NULL, '2025-12-04 11:16:37', '2025-12-04 11:16:37'),
 (4, 'moromi', 'studyneed12@gmail.com', NULL, '$2y$12$YacDz2sYr/VG/S6NpbIl0uInKkY1KJXzSgdgaf/kHipASq0jMjVCW', NULL, '2025-12-04 14:17:01', '2025-12-04 14:17:01');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wishlists`
+--
+
+CREATE TABLE `wishlists` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `product_id` bigint(20) UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `wishlists`
+--
+
+INSERT INTO `wishlists` (`id`, `user_id`, `product_id`, `created_at`, `updated_at`) VALUES
+(10, 1, 2, '2025-12-19 09:43:27', '2025-12-19 09:43:27'),
+(11, 1, 8, '2025-12-19 14:17:50', '2025-12-19 14:17:50');
 
 --
 -- Indexes for dumped tables
@@ -449,6 +481,14 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `users_email_unique` (`email`);
 
 --
+-- Indexes for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `wishlists_user_id_product_id_unique` (`user_id`,`product_id`),
+  ADD KEY `wishlists_product_id_foreign` (`product_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -462,7 +502,7 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -480,31 +520,37 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables
@@ -516,6 +562,13 @@ ALTER TABLE `users`
 ALTER TABLE `cart_items`
   ADD CONSTRAINT `cart_items_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `cart_items_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  ADD CONSTRAINT `wishlists_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `wishlists_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

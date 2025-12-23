@@ -11,7 +11,14 @@ use App\Models\Product;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Mail\AdminNewOrderMail;
+
+use App\Models\User;
+use App\Notifications\NewOrderNotification;
+
+
 use App\Mail\OrderPlacedMail;
+use App\Models\Admin;
 
 class CheckoutController extends Controller
 {
@@ -31,9 +38,9 @@ class CheckoutController extends Controller
 
             $cartItems = collect([
                 (object)[
-                    'product' => $product,
+                    'product'  => $product,
                     'quantity' => (int) $request->qty,
-                    'size' => $request->size,
+                    'size'     => $request->size,
                 ]
             ]);
 
@@ -42,7 +49,7 @@ class CheckoutController extends Controller
             return view('frontend.checkout.index', compact('cartItems', 'total'));
         }
 
-        // NORMAL CART FLOW
+        // CART FLOW
         $cartItems = CartItem::with('product')
             ->where('user_id', auth()->id())
             ->get();
@@ -52,7 +59,9 @@ class CheckoutController extends Controller
                 ->with('error', 'Your cart is empty');
         }
 
-        $total = $cartItems->sum(fn($i) => $i->product->price * $i->quantity);
+        $total = $cartItems->sum(fn ($i) =>
+            $i->product->price * $i->quantity
+        );
 
         return view('frontend.checkout.index', compact('cartItems', 'total'));
     }
@@ -63,100 +72,128 @@ class CheckoutController extends Controller
     public function placeOrder(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'address' => 'required',
-            'city' => 'required',
-            'pincode' => 'required',
-            'phone' => 'required',
+            'name'           => 'required',
+            'address'        => 'required',
+            'city'           => 'required',
+            'pincode'        => 'required',
+            'phone'          => 'required',
             'payment_method' => 'required',
 
-            // Buy now fields
             'product_id' => 'required_if:buy_now,1',
-            'qty' => 'required_if:buy_now,1|integer|min:1',
-            'size' => 'required_if:buy_now,1',
+            'qty'        => 'required_if:buy_now,1|integer|min:1',
+            'size'       => 'required_if:buy_now,1',
         ]);
 
         DB::beginTransaction();
 
         try {
 
-            /* ===== BUY NOW ORDER ===== */
-            if ($request->has('buy_now')) {
+            /* ======================
+               BUY NOW ORDER
+            ====================== */
+            if ($request->buy_now) {
 
-                $product = Product::findOrFail($request->product_id);
+                $product = Product::lockForUpdate()
+                    ->findOrFail($request->product_id);
 
                 if ($product->stock < $request->qty) {
-                    return back()->with('error', 'Not enough stock');
+                    throw new \Exception('Not enough stock available');
                 }
 
                 $order = Order::create([
-                    'user_id' => auth()->id(),
-                    'name' => $request->name,
-                    'email' => auth()->user()->email,
-                    'address' => $request->address,
-                    'city' => $request->city,
-                    'pincode' => $request->pincode,
-                    'phone' => $request->phone,
-                    'payment_method' => $request->payment_method,
-                    'total_amount' => $product->price * $request->qty,
-                    'status' => 'Pending',
+                    'user_id'          => auth()->id(),
+                    'name'             => $request->name,
+                    'email'            => auth()->user()->email,
+                    'address'          => $request->address,
+                    'city'             => $request->city,
+                    'pincode'          => $request->pincode,
+                    'phone'            => $request->phone,
+                    'payment_method'   => $request->payment_method,
+                    'payment_verified' => $request->payment_method === 'cod' ? 1 : 0,
+                    'total_amount'     => $product->price * $request->qty,
+                    'status'           => 'pending',
                 ]);
 
                 OrderItem::create([
-                    'order_id' => $order->id,
+                    'order_id'   => $order->id,
                     'product_id' => $product->id,
-                    'quantity' => $request->qty,
-                    'price' => $product->price,
-                    'size' => $request->size,
+                    'quantity'   => $request->qty,
+                    'price'      => $product->price,
+                    'size'       => $request->size,
                 ]);
 
                 $product->decrement('stock', $request->qty);
-
-                Mail::to($order->email)->send(new OrderPlacedMail($order));
-
                 DB::commit();
 
+                $order->load('items.product');
+
+                try {
+                    Mail::to($order->email)
+                        ->cc(config('mail.admin_email'))
+                        ->send(new OrderPlacedMail($order));
+                } catch (\Throwable $e) {
+                    // Email failure should not affect order placement
+                }
+
+                // Notify admin
+                $admin = Admin::first(); // or where('email', 'admin@app.com')
+
+                    if ($admin) {
+                        $admin->notify(new NewOrderNotification($order));
+                    }
+
+
+
                 return redirect()->route('home')
-                    ->with('success', 'Order placed successfully!');
+                    ->with('order_popup', true);
             }
 
-            /* ===== CART ORDER ===== */
+            /* ======================
+               CART ORDER
+            ====================== */
             $cartItems = CartItem::with('product')
                 ->where('user_id', auth()->id())
+                ->lockForUpdate()
                 ->get();
 
             if ($cartItems->isEmpty()) {
-                return redirect()->route('cart.index')
-                    ->with('error', 'Your cart is empty');
+                throw new \Exception('Your cart is empty');
             }
 
-            $total = $cartItems->sum(fn($i) => $i->product->price * $i->quantity);
+            foreach ($cartItems as $item) {
+                if ($item->product->stock < $item->quantity) {
+                    throw new \Exception(
+                        'Not enough stock for ' . $item->product->name
+                    );
+                }
+            }
+
+            $total = $cartItems->sum(fn ($i) =>
+                $i->product->price * $i->quantity
+            );
 
             $order = Order::create([
-                'user_id' => auth()->id(),
-                'name' => $request->name,
-                'email' => auth()->user()->email,
-                'address' => $request->address,
-                'city' => $request->city,
-                'pincode' => $request->pincode,
-                'phone' => $request->phone,
-                'payment_method' => $request->payment_method,
-                'total_amount' => $total,
-                'status' => 'Pending',
+                'user_id'          => auth()->id(),
+                'name'             => $request->name,
+                'email'            => auth()->user()->email,
+                'address'          => $request->address,
+                'city'             => $request->city,
+                'pincode'          => $request->pincode,
+                'phone'            => $request->phone,
+                'payment_method'   => $request->payment_method,
+                'payment_verified' => $request->payment_method === 'cod' ? 1 : 0,
+                'total_amount'     => $total,
+                'status'           => 'pending',
             ]);
 
             foreach ($cartItems as $item) {
 
-                if ($item->product->stock < $item->quantity) {
-                    throw new \Exception('Out of stock');
-                }
-
                 OrderItem::create([
-                    'order_id' => $order->id,
+                    'order_id'   => $order->id,
                     'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'price' => $item->product->price,
-                    'size' => $item->size,
+                    'quantity'   => $item->quantity,
+                    'price'      => $item->product->price,
+                    'size'       => $item->size,
                 ]);
 
                 $item->product->decrement('stock', $item->quantity);
@@ -164,19 +201,36 @@ class CheckoutController extends Controller
 
             CartItem::where('user_id', auth()->id())->delete();
 
-            Mail::to($order->email)->send(new OrderPlacedMail($order));
+           DB::commit();
 
-            DB::commit();
+            $order->load('items.product');
+
+            try {
+                Mail::to($order->email)
+                    ->cc(config('mail.admin_email'))
+                    ->send(new OrderPlacedMail($order));
+            } catch (\Throwable $e) {
+                // Email failure should not affect order placement
+            }
+
+            // Notify admin
+            $admin = Admin::first(); // or where('email', 'admin@app.com')
+
+        if ($admin) {
+            $admin->notify(new NewOrderNotification($order));
+        }
+
+
 
             return redirect()->route('home')
-                ->with('success', 'Order placed successfully!');
+                ->with('order_popup', true);
 
         } catch (\Throwable $e) {
 
             DB::rollBack();
 
             return redirect()->route('cart.index')
-                ->with('error', 'Some items are out of stock. Please try again.');
+                ->with('error', $e->getMessage());
         }
     }
 }

@@ -39,26 +39,40 @@ class OrderController extends Controller
     }
 
 
-    public function update(Request $request, Order $order)
+        public function update(Request $request, Order $order)
     {
         $request->validate([
             'status' => 'required|string',
+            'payment_verified' => 'required|boolean',
         ]);
 
-        $oldStatus = $order->status;  // Save previous status
-        $newStatus = $request->status;
+        // 1️⃣ Store old status BEFORE update
+        $oldStatus = $order->status;
 
-        // Update status
-        $order->status = $newStatus;
+        // 2️⃣ Update payment verification
+        $order->payment_verified = $request->payment_verified;
+
+        // 🚫 Block delivered if payment not verified
+        if ($request->status === 'delivered' && !$request->payment_verified) {
+            return back()->with('success', '❌ Payment not verified. Cannot mark as delivered.');
+        }
+
+        // 3️⃣ Update status
+        $order->status = $request->status;
         $order->save();
 
-        // Send EMAIL to customer
-        Mail::to($order->email)->send(
-            new OrderStatusUpdatedMail($order, $oldStatus, $newStatus)
-        );
+        // 4️⃣ Send status update email ONLY if status changed
+        if ($oldStatus !== $order->status) {
+            Mail::to($order->email)->send(
+                new OrderStatusUpdatedMail($order, $oldStatus, $order->status)
+            );
+        }
 
-        return redirect()->back()->with('success', 'Order Status Updated & Email Sent!');
+        return back()->with('success', '✅ Order updated successfully.');
     }
+
+
+
 
 
 
@@ -79,4 +93,6 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.index')
             ->with('success', 'Order deleted successfully!');
     }
+
+    
 }

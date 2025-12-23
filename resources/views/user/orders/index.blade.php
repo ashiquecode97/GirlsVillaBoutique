@@ -33,21 +33,21 @@
              <div class="mb-6 rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-sm text-indigo-800">
                     ⏱ <strong>Cancellation Policy:</strong>
                     Orders can be cancelled within <strong>24 hours</strong> and only when status is
-                    <strong>Pending</strong> or <strong>Processing</strong>.
+                    <strong>Pending</strong>
                 </div>
             @foreach($orders as $order)
                     @php
                         // card / badge classes mapped to statuses
                         $cardMap = [
                             'Pending' => ['bg'=>'bg-yellow-50','border'=>'border-yellow-200','ring'=>'ring-yellow-50'],
-                            'Processing' => ['bg'=>'bg-sky-50','border'=>'border-sky-200','ring'=>'ring-sky-50'],
-                            'Success' => ['bg'=>'bg-emerald-50','border'=>'border-emerald-200','ring'=>'ring-emerald-50'],
+                            'Success' => ['bg'=>'bg-sky-50','border'=>'border-sky-200','ring'=>'ring-sky-50'],
+                            'Delivered' => ['bg'=>'bg-emerald-50','border'=>'border-emerald-200','ring'=>'ring-emerald-50'],
                             'Cancelled' => ['bg'=>'bg-rose-50','border'=>'border-rose-200','ring'=>'ring-rose-50'],
                         ];
                         $badgeMap = [
                             'Pending' => 'bg-yellow-200 text-yellow-800',
-                            'Processing' => 'bg-sky-200 text-sky-800',
-                            'Success' => 'bg-emerald-200 text-emerald-800',
+                            'Success' => 'bg-sky-200 text-sky-800',
+                            'Delivered' => 'bg-emerald-200 text-emerald-800',
                             'Cancelled' => 'bg-rose-200 text-rose-800',
                         ];
                         $card = $cardMap[$order->status] ?? ['bg'=>'bg-gray-50','border'=>'border-gray-200','ring'=>'ring-gray-50'];
@@ -72,7 +72,7 @@
                                 {{ ucfirst($order->status) }}
                             </span>
 
-                            <a href="{{ route('admin.orders.invoice', $order) ?? '#' }}"
+                            {{-- <a href="{{ route('admin.orders.invoice', $order) ?? '#' }}"
                             class="px-3 py-1 text-xs rounded-md bg-white border text-indigo-600 hover:bg-indigo-50">
                                 📄 Invoice
                             </a>
@@ -80,7 +80,7 @@
                             <button onclick="window.print()"
                                 class="px-3 py-1 text-xs rounded-md bg-white border text-gray-700 hover:bg-gray-100">
                                 🖨 Print
-                            </button>
+                            </button> --}}
                         </div>
                     </div>
 
@@ -91,8 +91,12 @@
                         <div class="lg:col-span-2 space-y-4">
                             @foreach($order->items as $item)
                                 <div class="flex gap-4 rounded-xl bg-white p-4 border">
-                                    <img src="{{ asset('storage/'.$item->product->image) }}"
-                                        class="w-20 h-24 object-cover rounded-lg">
+                                    <a href="{{ route('products.show', $item->product) }}"
+                                        class="block hover:opacity-90 transition">
+                                            <img src="{{ asset('storage/'.$item->product->image) }}"
+                                                class="w-20 h-24 object-cover rounded-lg">
+                                    </a>
+
 
                                     <div class="flex-1">
                                         <h4 class="font-semibold text-gray-800">{{ $item->product->name }}</h4>
@@ -121,24 +125,23 @@
                             </div>
 
                             {{-- CANCEL BUTTON --}}
-                            @if(in_array($order->status, ['Pending', 'Processing']))
+                           {{-- CANCEL BUTTON --}}
+                            @if(in_array(strtolower($order->status), ['pending', 'success']))
 
-                                {{-- ⏱ Allowed within 24 hours --}}
                                 @if($order->created_at->diffInHours(now()) <= 24)
-
                                     <form action="{{ route('user.orders.cancel', $order) }}"
                                         method="POST"
                                         class="mt-4"
                                         onsubmit="return confirm('Are you sure you want to cancel this order?');">
                                         @csrf
+                                        {{-- @method('PUT') --}}
+
                                         <button
                                             class="w-full py-2 rounded-lg bg-rose-600 text-white font-semibold
                                                 hover:bg-rose-700 transition">
                                             ❌ Cancel Order
                                         </button>
                                     </form>
-
-                                {{-- ⛔ Expired --}}
                                 @else
                                     <span class="mt-3 inline-block text-xs text-gray-500 italic">
                                         ⏱ Cancellation window expired (24 hours passed)
@@ -146,6 +149,7 @@
                                 @endif
 
                             @endif
+
 
                         </aside>
 

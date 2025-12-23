@@ -30,3 +30,22 @@ body {
     transform: translateY(-4px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
+.hover-lift:hover {
+    transform: translateY(-6px);
+}
+.glass {
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.8);
+}
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+.animate-scaleIn {
+    animation: scaleIn 0.25s ease-out;
+}
+/* [x-cloak] { display: none !important; } */
+[x-cloak] {
+    display: none !important;
+}

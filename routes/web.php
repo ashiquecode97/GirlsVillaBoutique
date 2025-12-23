@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Frontend\UserOrderController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\ShopController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\WishlistController;
+use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 
 // FRONTEND
@@ -26,7 +28,9 @@ Route::get('/my-orders/{order}', [UserOrderController::class, 'show'])
 Route::post('/orders/{order}/cancel', [UserOrderController::class, 'cancel'])
         ->name('user.orders.cancel');   
 
-
+Route::get('/my-orders/{order}/invoice',
+        [UserOrderController::class, 'invoice']
+    )->name('user.orders.invoice');
 
 // BREEZE AUTH ROUTES
 require __DIR__.'/auth.php';
@@ -47,7 +51,8 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/wishlist/{wishlist}', [WishlistController::class, 'destroy'])
         ->name('wishlist.destroy');
-  
+    
+        
         
 });
 
@@ -55,11 +60,18 @@ Route::middleware('auth')->group(function () {
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.post');
 
-// ADMIN DASHBOARD (PROTECTED)
-Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+// ADMIN ROUTES (PROTECTED)
+Route::middleware('admin')
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
-    
+    // DASHBOARD ✅
+ Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
+
+
     // PRODUCTS
     Route::resource('products', AdminProductController::class);
 
@@ -68,14 +80,46 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])
-    ->name('orders.invoice');
-    Route::delete('/admin/orders/{order}', [OrderController::class, 'destroy'])
-    ->name('orders.destroy');
+        ->name('orders.invoice');
+    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])
+        ->name('orders.destroy');
+
+    Route::get('/notifications/{id}', function ($id) {
+
+    // Get logged-in admin from session
+        $adminId = session('admin_id');
+
+        if (!$adminId) {
+            abort(403);
+        }
+
+        $admin = \App\Models\Admin::find($adminId);
+
+        if (!$admin) {
+            abort(403);
+        }
+
+        $notification = $admin->notifications()
+            ->where('id', $id)
+            ->first();
+
+        if ($notification) {
+            $notification->markAsRead();
+        }
+
+        return redirect()->route(
+            'admin.orders.show',
+            $notification->data['order_id'] ?? null
+        );
+
+    })->name('notifications.read');
 
 
     // LOGOUT
-    Route::get('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+    Route::get('/logout', [AdminAuthController::class, 'logout'])
+        ->name('logout');
 });
+
 
     
 

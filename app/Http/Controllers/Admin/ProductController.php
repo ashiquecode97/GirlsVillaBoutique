@@ -94,4 +94,6 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.index')->with('success', 'Deleted');
     }
+ 
+
 }

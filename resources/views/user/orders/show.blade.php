@@ -13,15 +13,15 @@
         </h1>
 
         <div class="flex gap-3">
-            <a href="{{ route('admin.orders.invoice', $order) }}"
+            <a href="{{ route('user.orders.invoice', $order) }}"
                class="px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700">
                📄 Download Invoice
             </a>
 
-            <button onclick="window.print()"
+            {{-- <button onclick="window.print()"
                 class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow hover:bg-gray-300">
                 🖨 Print
-            </button>
+            </button> --}}
             
         </div>
     </div>

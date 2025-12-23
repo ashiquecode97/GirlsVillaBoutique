@@ -30,9 +30,43 @@
 
             <h1 class="text-3xl font-bold">{{ $product->name }}</h1>
 
-            <p class="text-3xl font-extrabold text-green-600">
-                ₹{{ number_format($product->price) }}
-            </p>
+                        {{-- PRICE + WISHLIST --}}
+            <div class="flex items-center justify-between">
+
+                <p class="text-3xl font-extrabold text-green-600">
+                    ₹{{ number_format($product->price) }}
+                </p>
+
+                {{-- WISHLIST --}}
+                @auth
+                    <form action="{{ route('wishlist.toggle', $product) }}" method="POST">
+                        @csrf
+                        <button
+                            class="flex items-center gap-2 px-4 py-2 rounded-full border
+                            {{ auth()->user()->wishlists->contains('product_id', $product->id)
+                                ? 'bg-pink-100 border-pink-400 text-pink-600'
+                                : 'hover:bg-pink-50 border-pink-200 text-pink-600' }}
+                            transition">
+                            ❤️
+                            <span class="text-sm font-semibold">
+                                {{ auth()->user()->wishlists->contains('product_id', $product->id)
+                                    ? 'Wishlisted'
+                                    : 'Wishlist' }}
+                            </span>
+                        </button>
+                    </form>
+                @else
+                    <button
+                        onclick="openLoginModal()"
+                        class="flex items-center gap-2 px-4 py-2 rounded-full border
+                            border-pink-200 text-pink-600 hover:bg-pink-50 transition">
+                        ❤️
+                        <span class="text-sm font-semibold">Wishlist</span>
+                    </button>
+                @endauth
+
+            </div>
+
 
             {{-- STOCK --}}
             <span class="inline-block px-4 py-1 rounded-full text-sm font-semibold
@@ -67,31 +101,55 @@
             </div>
             @endif
 
-            {{-- ADD TO CART --}}
-            @auth
-            @if($product->stock > 0)
-                <form action="{{ route('cart.add', $product) }}"
-                      method="POST"
-                      onsubmit="return validateSize()">
-                    @csrf
-                    <input type="hidden" name="selected_size" id="selected_size">
+           
+                {{-- ADD TO CART --}}
+                @if($product->stock > 0)
 
-                    <button class="mt-4 px-10 py-3 bg-indigo-600 text-white rounded-full font-semibold">
-                        🛒 Add to Cart
-                    </button>
-                </form>
-            @endif
-            @endauth
+                    @auth
+                        <form action="{{ route('cart.add', $product) }}"
+                            method="POST"
+                            onsubmit="return validateSize()">
+                            @csrf
+                            <input type="hidden" name="selected_size" id="selected_size">
 
-            {{-- BUY NOW --}}
-            @if($product->stock > 0)
-                <button
-                    type="button"
-                    onclick="openBuyNowModalChecked()"
-                    class="mt-3 px-10 py-3 bg-green-600 text-white rounded-full font-semibold">
-                    ⚡ Buy Now
-                </button>
-            @endif
+                            <button
+                                class="mt-4 px-10 py-3 bg-indigo-600 text-white rounded-full font-semibold">
+                                🛒 Add to Cart
+                            </button>
+                        </form>
+                    @else
+                        <button
+                            type="button"
+                            onclick="openLoginModal()"
+                            class="mt-4 px-10 py-3 bg-indigo-600 text-white rounded-full font-semibold">
+                            🛒 Add to Cart
+                        </button>
+                    @endauth
+
+                @endif
+
+
+                {{-- BUY NOW --}}
+                @if($product->stock > 0)
+
+                    @auth
+                        <button
+                            type="button"
+                            onclick="openBuyNowModalChecked()"
+                            class="mt-3 px-10 py-3 bg-green-600 text-white rounded-full font-semibold">
+                            ⚡ Buy Now
+                        </button>
+                    @else
+                        <button
+                            type="button"
+                            onclick="openLoginModal()"
+                            class="mt-3 px-10 py-3 bg-green-600 text-white rounded-full font-semibold">
+                            ⚡ Buy Now
+                        </button>
+                    @endauth
+
+                @endif
+
 
         </div>
     </div>
@@ -133,6 +191,32 @@
         <button
             onclick="closeBuyNowModal()"
             class="w-full py-2 text-gray-600 text-sm">
+            Cancel
+        </button>
+    </div>
+</div>
+{{-- LOGIN REQUIRED MODAL --}}
+<div id="loginRequiredModal"
+     class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+
+    <div class="bg-white w-[90%] max-w-sm rounded-2xl p-6 text-center space-y-5">
+
+        <h2 class="text-xl font-bold text-gray-800">
+            🔐 Login Required
+        </h2>
+
+        <p class="text-gray-600">
+            Please login to continue shopping.
+        </p>
+
+        <a href="{{ route('login') }}"
+           class="block w-full py-3 bg-indigo-600 hover:bg-indigo-700
+                  text-white rounded-lg font-semibold transition">
+            Login
+        </a>
+
+        <button onclick="closeLoginModal()"
+                class="text-sm text-gray-500 hover:underline">
             Cancel
         </button>
     </div>
@@ -205,4 +289,23 @@ function buyNowProceed() {
 function changeImage(el) {
     document.getElementById('mainImage').src = el.src;
 }
+
+
+function openLoginModal() {
+    document.getElementById('loginRequiredModal')
+        .classList.remove('hidden');
+    document.getElementById('loginRequiredModal')
+        .classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLoginModal() {
+    document.getElementById('loginRequiredModal')
+        .classList.add('hidden');
+    document.getElementById('loginRequiredModal')
+        .classList.remove('flex');
+    document.body.style.overflow = '';
+}
+
+
 </script>

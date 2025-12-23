@@ -4,14 +4,16 @@
 
 <h1 class="text-3xl font-bold mb-6 text-gray-800">Checkout</h1>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6"
+     x-data="{ payment: '' }">
 
-    <!-- LEFT: ADDRESS + PAYMENT FORM -->
+    <!-- LEFT -->
     <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border">
-
 
         <form method="POST" action="{{ route('checkout.placeOrder') }}" class="space-y-5">
             @csrf
+
+            {{-- BUY NOW HIDDEN FIELDS --}}
             @if(request('buy_now'))
                 <input type="hidden" name="buy_now" value="1">
                 <input type="hidden" name="product_id" value="{{ $cartItems[0]->product->id }}">
@@ -19,82 +21,95 @@
                 <input type="hidden" name="size" value="{{ $cartItems[0]->size }}">
             @endif
 
-            <!-- Name -->
+            {{-- NAME --}}
             <div>
-                <label class="text-gray-700 font-medium">Full Name</label>
-                <input type="text" name="name" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+                <label class="font-medium text-gray-700">Full Name</label>
+                <input name="name" class="w-full border rounded-lg p-2 mt-1" required>
             </div>
 
-            <!-- Address -->
+            {{-- EMAIL --}}
+            {{-- <div>
+                <label class="font-medium text-gray-700">Email( Order details sent to this email.)</label>
+                <input name="email" class="w-full border rounded-lg p-2 mt-1" required>
+            </div> --}}
+
+            {{-- ADDRESS --}}
             <div>
-                <label class="text-gray-700 font-medium">Delivery Address</label>
-                <textarea name="address" class="w-full border rounded-lg px-3 py-2 mt-1" rows="3" required></textarea>
+                <label class="font-medium text-gray-700">Delivery Address</label>
+                <textarea name="address" rows="3"
+                          class="w-full border rounded-lg p-2 mt-1" required></textarea>
             </div>
 
-            <!-- City + Pincode -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="text-gray-700 font-medium">City</label>
-                    <input type="text" name="city" class="w-full border rounded-lg px-3 py-2 mt-1" required>
+            {{-- CITY & PIN --}}
+            <div class="grid grid-cols-2 gap-4">
+                <input name="city" placeholder="City"
+                       class="border p-2 rounded-lg" required>
+                <input name="pincode" placeholder="Pincode"
+                       class="border p-2 rounded-lg" required>
+            </div>
+
+            {{-- PHONE --}}
+            <input name="phone" placeholder="Phone"
+                   class="w-full border p-2 rounded-lg" required>
+
+            {{-- PAYMENT --}}
+            <h3 class="text-xl font-semibold text-gray-800">Payment Method</h3>
+
+            <label class="flex gap-3 border p-3 rounded-lg cursor-pointer">
+                <input type="radio" name="payment_method" value="cod"
+                       x-model="payment" required>
+                Cash on Delivery
+            </label>
+
+            <label class="flex gap-3 border p-3 rounded-lg cursor-pointer">
+                <input type="radio" name="payment_method" value="online"
+                       x-model="payment" required>
+                UPI / Online Payment
+            </label>
+
+            {{-- UPI DETAILS --}}
+            <div x-show="payment === 'online'" x-cloak
+                 class="bg-gray-50 p-4 rounded-xl space-y-3">
+
+                <img src="{{ asset('storage/upi-qr.jpeg') }}"
+                     class="w-40 mx-auto rounded-lg">
+
+                <div class="flex gap-2">
+                    <input readonly value="7002233886@ybl"
+                           class="w-full bg-gray-100 p-2 rounded">
+                    <button type="button"
+                        onclick="navigator.clipboard.writeText('7002233886@ybl')"
+                        class="px-3 bg-indigo-600 text-white rounded">
+                        Copy
+                    </button>
                 </div>
-                <div>
-                    <label class="text-gray-700 font-medium">Pincode</label>
-                    <input type="text" name="pincode" class="w-full border rounded-lg px-3 py-2 mt-1" required>
-                </div>
-            </div>
-
-            <!-- Phone -->
-            <div>
-                <label class="text-gray-700 font-medium">Phone Number</label>
-                <input type="text" name="phone" class="w-full border rounded-lg px-3 py-2 mt-1" required>
-            </div>
-
-            <!-- Payment -->
-            <h3 class="text-xl font-semibold text-gray-800 mt-6">Payment Method</h3>
-
-            <div class="space-y-3 mt-2">
-
-                <label class="flex items-center gap-3 border rounded-lg p-3 cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="payment_method" value="cod" required>
-                    <span class="text-gray-700 font-medium">Cash on Delivery</span>
-                </label>
-
-                <label class="flex items-center gap-3 border rounded-lg p-3 cursor-pointer hover:bg-gray-50">
-                    <input type="radio" name="payment_method" value="online" required>
-                    <span class="text-gray-700 font-medium">UPI / Online Payment</span>
-                </label>
             </div>
 
             <button
-                class="mt-5 w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold text-lg transition">
+                class="w-full bg-green-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-green-700">
                 Confirm Order
             </button>
         </form>
-
     </div>
 
-    <!-- RIGHT: ORDER SUMMARY -->
+    <!-- RIGHT -->
     <div class="bg-white p-6 rounded-xl shadow-md border">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Order Summary</h2>
+        <h2 class="text-xl font-bold mb-4">Order Summary</h2>
 
-       @foreach($cartItems as $item)
-            <div class="flex justify-between mb-2">
+        @foreach($cartItems as $item)
+            <div class="flex justify-between text-sm mb-2">
                 <span>
-                    {{ $item->product->name }}
-                    <span class="text-xs text-gray-500">Qty {{ $item->quantity }}</span>
-                    @if($item->size)
-                        <span class="text-xs">(Size {{ $item->size }})</span>
-                    @endif
+                    {{ $item->product->name }} × {{ $item->quantity }}
                 </span>
-                <span>₹{{ number_format($item->quantity * $item->product->price) }}</span>
+                <span>
+                    ₹{{ number_format($item->product->price * $item->quantity) }}
+                </span>
             </div>
         @endforeach
 
-
-
         <hr class="my-3">
 
-        <div class="flex justify-between text-lg font-bold text-gray-800">
+        <div class="flex justify-between font-bold text-lg">
             <span>Total</span>
             <span>₹{{ number_format($total) }}</span>
         </div>
